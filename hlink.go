@@ -24,8 +24,9 @@ func main() {
     // make a direct call to the syscall of current OS
 	if err := os.Link(src, dst); err != nil {
         // if there is an error, prints error message and exits
+        log.Println("An error occurred while trying to create requested link")
 		log.Fatal(err)
 	}
 
-	log.Println("Link successfully created requested link")
+	log.Println("Successfully created requested link")
 }
