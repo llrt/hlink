@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+    "fmt"
 	"log"
 	"os"
 )
@@ -24,14 +25,24 @@ func main() {
 
         dst := args[0] // destination
 
-        // make a direct call to the syscall of current OS
-        if err := os.Remove(dst); err != nil {
-            // if there is an error, prints error message and exits
-            log.Println("An error occurred while trying to remove specified link")
-            log.Fatal(err)
+        yn := "n"
+        fmt.Println("WARNING: removing hard link does delete all structure on destination. Confirm removal? [y|n]")
+        fmt.Scanf("%s", &yn)
+
+        if yn == "y"{ // removal confirmed: proceed with removal
+            log.Println("Removal confirmed. Hard link will be removed")
+            // make a direct call to the syscall of current OS
+            if err := os.Remove(dst); err != nil {
+                // if there is an error, prints error message and exits
+                log.Println("An error occurred while trying to remove specified link")
+                log.Fatal(err)
+            }
+
+            log.Println("Successfully removed specified link")
+        } else { // removal cancelled
+            log.Println("Removal cancelled. Nothing done")
         }
 
-        log.Println("Successfully removed specified link")
     } else { // otherwise, do link source to destination
         // check if there are exactly two arguments (source and destination of hard link)
         if len(args) != 2 {
