@@ -7,26 +7,49 @@ import (
 )
 
 func main() {
+    unln := flag.Bool("u", false, "Unlinks the specified destination path")
+
     flag.Parse()
 
     // receives arguments from command line
 	args := flag.Args()
 
-    // check if there are exactly two arguments (source and destination of hard link)
-	if len(args) != 2 {
-        log.Println(args)
-		log.Fatal("Link script must receive exactly two arguments: source and destination")
-	}
 
-	src := args[0]
-	dst := args[1]
+    if *unln { // if -u flag was provided, do unlink destination
+        // check if there is exactly one arguments (destination of hard link)
+        if len(args) != 1 {
+            log.Println(args)
+            log.Fatal("Link script must receive exactly one argument when unlinking: destination")
+        }
 
-    // make a direct call to the syscall of current OS
-	if err := os.Link(src, dst); err != nil {
-        // if there is an error, prints error message and exits
-        log.Println("An error occurred while trying to create requested link")
-		log.Fatal(err)
-	}
+        dst := args[0] // destination
 
-	log.Println("Successfully created requested link")
+        // make a direct call to the syscall of current OS
+        if err := os.Remove(dst); err != nil {
+            // if there is an error, prints error message and exits
+            log.Println("An error occurred while trying to remove specified link")
+            log.Fatal(err)
+        }
+
+        log.Println("Successfully removed specified link")
+    } else { // otherwise, do link source to destination
+        // check if there are exactly two arguments (source and destination of hard link)
+        if len(args) != 2 {
+            log.Println(args)
+            log.Fatal("Link script must receive exactly two arguments when linking: source and destination")
+        }
+
+        src := args[0] // source
+        dst := args[1] // destination
+
+        // make a direct call to the syscall of current OS
+        if err := os.Link(src, dst); err != nil {
+            // if there is an error, prints error message and exits
+            log.Println("An error occurred while trying to create specified link")
+            log.Fatal(err)
+        }
+
+        log.Println("Successfully created specified link")
+    }
+
 }
